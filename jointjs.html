@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/2.1.0/joint.css"
+        />
+        -->
+
+    <link rel="stylesheet" type="text/css" href="css/joint.css" />
+    <style>
+        button {
+            margin: 3px;
+            border: 1px solid skyblue;
+            background-color: rgba(0, 0, 0, 0);
+            color: red;
+            padding: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            transition: all 0.5s;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            /*
+                opacity: 0.6;
+                cursor: not-allowed;
+                */
+        }
+        
+        button:hover {
+            color: white;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- content -->
+    <div id="myholder" style="border: 10px solid red;"></div>
+
+    <!-- dependencies -->
+    <!--
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/2.1.0/joint.js"></script>
+        <script src="js/colResizable-1.6.min.js"></script>
+        -->
+    <script src="js/jquery.js"></script>
+    <script src="js/lodash.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/joint.js"></script>
+    <script src="js/colResizable-1.6.min.js"></script>
+
+    <!-- code -->
+    <script type="text/javascript">
+        var graph = new joint.dia.Graph();
+
+        /*
+        graph.on('add', function (cell) {
+            alert('New cell with id ' + cell.id + ' added to the graph.');
+        });
+        */
+
+        var paper = new joint.dia.Paper({
+            el: document.getElementById('myholder'),
+            model: graph,
+            width: 900,
+            height: 500,
+            gridSize: 10,
+            drawGrid: {
+                name: 'doubleMesh',
+                //name: 'mesh',
+                args: [{
+                        color: 'red',
+                        thickness: 1
+                    }, // settings for the primary mesh
+                    {
+                        color: 'green',
+                        scaleFactor: 5,
+                        thickness: 5
+                    }, //settings for the secondary mesh
+                ],
+            },
+            background: {
+                color: 'rgba(0, 255, 0, 0.3)',
+            },
+            interactive: {
+                elementMove: false,
+                addLinkFromMagnet: false
+            },
+            /*
+            elementMove: true,
+            interactive: false, */
+        });
+
+        //var tWidth = paper.model.get('width');
+        //console.log(paper.model.get('cells'));
+
+        var rect = new joint.shapes.standard.Rectangle();
+        rect.position(100, 30);
+        rect.resize(100, 40);
+        rect.attr({
+            body: {
+                fill: 'blue',
+            },
+            label: {
+                text: 'Hello',
+                fill: 'white',
+            },
+        });
+
+        //rect.attr('root/title', 'joint.shapes.standard.Rectangle');
+        rect.addTo(graph);
+
+        /*
+        var shadowLink = new joint.shapes.standard.ShadowLink();
+        shadowLink.prop('source', { x: 550, y: 400 });
+        shadowLink.prop('target', { x: 500, y: 450 });
+        shadowLink.prop('vertices', [{ x: 550, y: 480 }]);
+        shadowLink.attr('root/title', 'joint.shapes.standard.ShadowLink');
+        shadowLink.attr('line/stroke', '#5654a0');
+        shadowLink.addTo(graph);
+        */
+        //var a = joint.util.getElementBBox(paper.el);
+        var strTemp = joint.util.breakText('= AI Vision =프로세스관리', {
+            width: 100,
+            height: 100
+        });
+        //var strTemp = joint.util.breakText('= AI Vision =프로세스관리', { width: 100, height: 50 }, { 'font-size': 16 }, { ellipsis: true })
+        var textBlock = new joint.shapes.standard.TextBlock();
+        textBlock.resize(100, 50);
+        textBlock.position(800, 450);
+        textBlock.attr('root/title', 'joint.shapes.standard.TextBlock');
+        textBlock.attr('body/fill', 'lightgray');
+        textBlock.attr('label/text', strTemp);
+        //textBlock.content("<p style='color:white;'>asdf asdf asdf asdf this needs to word wrap</p>");
+        //console.log(textBlock);
+        for (var tb in textBlock) {
+            //console.log(textBlock[tb]);
+        }
+        // Styling of the label via `style` presentation attribute (i.e. CSS).
+        textBlock.attr('label/style/color', 'red');
+        textBlock.addTo(graph);
+
+        var rect2 = new joint.shapes.standard.Rectangle();
+        rect2.position(400, 30);
+        rect2.resize(100, 40);
+        rect2.attr({
+            body: {
+                fill: '#2C3E50',
+                rx: 5,
+                ry: 5,
+                strokeWidth: 2,
+            },
+            label: {
+                text: 'World!',
+                fill: '#3498DB',
+                fontSize: 18,
+                fontWeight: 'bold',
+                fontVariant: 'small-caps',
+            },
+        });
+        rect2.addTo(graph);
+
+        var link = new joint.shapes.standard.Link();
+        link.source(rect);
+        link.target(rect2);
+        link.addTo(graph);
+
+        var rect3 = new joint.shapes.standard.Rectangle();
+        rect3.position(100, 130);
+        rect3.resize(100, 40);
+        rect3.attr({
+            body: {
+                fill: '#E74C3C',
+                rx: 20,
+                ry: 20,
+                strokeWidth: 0,
+            },
+            label: {
+                text: 'Hello',
+                fill: '#ECF0F1',
+                fontSize: 11,
+                fontVariant: 'small-caps',
+            },
+        });
+        rect3.addTo(graph);
+
+        var rect4 = new joint.shapes.standard.Rectangle();
+        rect4.position(400, 130);
+        rect4.resize(100, 40);
+        rect4.attr({
+            body: {
+                fill: '#8E44AD',
+                strokeWidth: 0,
+            },
+            label: {
+                text: 'World!',
+                fill: 'white',
+                fontSize: 13,
+            },
+        });
+
+        //console.log(rect4.attr('body/fill'));
+
+        rect4.addTo(graph);
+
+        var link2 = new joint.shapes.standard.Link();
+        link2.source(rect3);
+        link2.target(rect4);
+        link2.addTo(graph);
+
+        var link10 = new joint.shapes.standard.Link();
+        link10.source(rect);
+        link10.target(rect4);
+        link10.addTo(graph);
+
+        var rect5 = new joint.shapes.standard.Rectangle();
+        rect5.position(100, 230);
+        rect5.resize(100, 40);
+        rect5.attr({
+            body: {
+                fill: '#2ECC71',
+                strokeDasharray: '10,2',
+            },
+            label: {
+                text: 'Hello',
+                fill: 'black',
+                fontSize: 13,
+            },
+        });
+        rect5.addTo(graph);
+
+        var rect6 = new joint.shapes.standard.Rectangle();
+        rect6.position(400, 230);
+        rect6.resize(100, 40);
+        rect6.attr({
+            body: {
+                fill: '#F39C12',
+                rx: 20,
+                ry: 20,
+                strokeDasharray: '1,1',
+            },
+            label: {
+                text: 'World!',
+                fill: 'gray',
+                fontSize: 18,
+                fontWeight: 'bold',
+                fontVariant: 'small-caps',
+                textShadow: '1px 1px 1px black',
+            },
+        });
+        rect6.addTo(graph);
+
+        var link3 = new joint.shapes.standard.Link();
+        link3.source(rect5);
+        link3.target(rect6);
+        link3.addTo(graph);
+
+        var link4 = new joint.shapes.standard.Link();
+        link4.attr('line/stroke', 'orange');
+
+        /*
+        graph.on('add', function (cell) {
+            alert('New cell with id ' + cell.id + ' added to the graph.');
+        });
+
+        graph.on('change:position', function (element, position) {
+            console.log(
+                'Element ' +
+                    element.id +
+                    'moved to ' +
+                    position.x +
+                    ',' +
+                    position.y
+            );
+        });
+        */
+
+        paper.on({
+            'blank:pointerdown': function(evt, x, y) {
+                var link = new joint.dia.Link();
+                link.set('source', {
+                    x: x,
+                    y: y
+                });
+                link.set('target', {
+                    x: x,
+                    y: y
+                });
+                link.addTo(this.model);
+                evt.data = {
+                    link: link,
+                    x: x,
+                    y: y
+                };
+            },
+            'blank:pointermove': function(evt, x, y) {
+                evt.data.link.set('target', {
+                    x: x,
+                    y: y
+                });
+            },
+            'blank:pointerup': function(evt) {
+                var target = evt.data.link.get('target');
+                if (evt.data.x === target.x && evt.data.y === target.y) {
+                    // remove zero-length links
+                    evt.data.link.remove();
+                }
+            }
+        });
+
+        //$( "#" ).trigger( "click" );
+        //paper.trigger('element:pointerclick');
+        //var Temp = null;
+        paper.on('element:pointerclick', function(cellView) {
+            // if(Temp != null)
+            //    Temp.unhighlight();
+
+            //resetAll(this);
+            //console.log(cellView.constructor);
+            //console.log(cellView.el.dataset.type);
+            //console.log(cellView.el.length);
+
+            var classNames = joint.dia.CellView.prototype.className.apply(this).split(' ');
+
+            classNames.push('element');
+
+            var sTemp = classNames.join(' ');
+            //console.log(sTemp);
+
+            paper.findViewsInArea(paper.getArea()).forEach((cell) => {
+                //cell.unhighlight();
+
+                cell.unhighlight(cell.el, {
+                    highlighter: {
+                        name: 'stroke',
+                        options: {
+                            padding: 10,
+                            rx: 5,
+                            ry: 5,
+                            attrs: {
+                                'stroke-width': 5,
+                                stroke: '#FF0000',
+                            }
+                        }
+                    }
+                });
+
+                console.log('processSeq => ' + cellView.model.processSeq);
+                //console.log(rectTarget.processSeq);
+
+            });
+
+            var tBox = cellView.model.getBBox();
+            //console.log(tBox.width);
+            /*
+            var currentElement = cellView.model;
+            currentElement.attr('body/stroke', 'red')
+            */
+
+
+            //console.log(Object.keys(cellView));
+            for (var key in cellView) {
+                //if (key == "files")
+                //console.log(key + '=> ' + cellView[key]);
+            }
+
+            /*
+            for (var key in cellView.el) {
+                console.log(key);
+            }
+            */
+
+            //console.log(cellView.el.keys());
+
+            if (cellView.el.dataset.type == 'standard.Rectangle') {
+                //cellView.highlight();
+                var thick = 1;
+                cellView.highlight(null, {
+                    highlighter: {
+                        name: 'stroke',
+                        options: {
+                            padding: 10,
+                            rx: 5,
+                            ry: 5,
+                            attrs: {
+                                'stroke-width': 5,
+                                stroke: '#FF0000',
+                            }
+                        }
+                    }
+                });
+
+                //Temp = {...cellView};
+                //Temp = JSON.parse(JSON.stringify(cellView));
+            }
+
+            //graph.removeCells(cellView);
+            //alert(cellView.id);
+            //graph.getCell(cellView.id).remove();
+            //graph.removeCells([graph.getCell(linkId)])
+            //graph.getCell(linkId).remove()
+            //console.log(cellView.el.baseURI);
+            //console.log(paper.length());
+            /*
+                $.each(cellView, function (index, item) {
+                    console.log(index + '=>' + item);
+                });
+                */
+            //var objTemp = $('#myholder > svg g[model-id]');
+            //console.log(objTemp.length)
+            //console.log($('#myholder > svg g[model-id]'));
+            //console.log(paper.el);
+            /*
+                console.log(cellView.el.dataset.type);
+            */
+        });
+
+        paper.on('blank:pointerdblclick', function() {
+            resetAll(this);
+
+            //console.log(info);
+
+            /*
+            info.attr('body/visibility', 'hidden');
+            info.attr('label/visibility', 'hidden');
+
+            this.drawBackground({
+                color: 'orange',
+            });
+            */
+        });
+
+        paper.on('cell:pointerdblclick', function(cellView) {
+            //colsole.log(cellView.attr('label/text'));
+            console.log($('#' + cellView.id + ' tspan').text());
+            $('#' + cellView.id + ' tspan').text('NODE1');
+            console.log(cellView.el.lastElementChild);
+            console.log(cellView.el.dataset.type);
+            console.log(cellView instanceof joint.dia.Element);
+
+            console.log(
+                [
+                    '<div class="html-element">',
+                    '<button class="delete">x</button>',
+                    '<label></label>',
+                    '<span></span>',
+                    '<br/>',
+                    '<select><option>--</option><option>one</option><option>two</option></select>',
+                    '<input type="text" value="I\'m HTML input" />',
+                    '</div>',
+                ].join('')
+            );
+
+            //var temp = document.querySelector('#' + cellView.id);
+            /*
+            for (var key in cellView.el) {
+                console.log(key);
+            }
+            */
+        });
+
+        /*
+        paper.on('blank:pointerdown', (evt, x, y) => {
+            paper.findViewsInArea(paper.getArea()).forEach((cell) => {
+                cell.unhighlight();
+            });
+        });
+        */
+
+        /*
+        paper.on('cell:pointerclick', function (cellView) {
+            cellView.highlight();
+        });
+        */
+        paper.on('element:delete', function(elementView, evt) {
+            // Stop any further actions with the element view e.g. dragging
+            evt.stopPropagation();
+            if (confirm('Are you sure you want to delete this element?')) {
+                elementView.model.remove();
+            }
+        });
+
+        /*
+            $('p').on('mouseenter mouseleave', function () {
+                $('div').append(
+                    '마우스 커서가 문장 위로 들어오거나 빠져 나갔습니다.<br>'
+                );
+            });
+
+            $(window).resize(function() {
+                var canvas = $('#myholder');
+                paper.setDimensions(canvas.width(), canvas.height());
+            });
+        */
+
+        //$('#sample').colResizable({ liveDrag: true });
+        var rectSource = {};
+        var rectTarget = {};
+
+        var linkComm = {};
+        var linkTemp = {};
+
+        var rectArray = [];
+
+        function resetAll(paper) {
+            /*
+            paper.drawBackground({
+                color: 'white',
+            });
+            */
+
+
+            var elements = paper.model.getElements();
+            for (var i = 0; i < elements.length; i++) {
+                var currentElement = elements[i];
+                //console.log(currentElement.constructor);
+                //currentElement.highlight();
+                if (i == 0) {
+                    //console.log(Object.keys(currentElement));
+                }
+                //currentElement.attr('body/stroke', 'black');
+                //currentElement.attr('body/strokeWidth', '5');
+                /*
+                currentElement.highlight(null, {
+                    highlighter: {
+                        name: 'stroke',
+                        options: {
+                            padding: 0,
+                            rx: 5,
+                            ry: 5,
+                            attrs: {
+                                'stroke-width': 1,
+                                stroke: '#FF0000',
+                            }
+                        }
+                    }
+                });
+                */
+            }
+
+            var links = paper.model.getLinks();
+            for (var j = 0; j < links.length; j++) {
+                var currentLink = links[j];
+                currentLink.attr('line/stroke', 'black');
+                currentLink.label(0, {
+                    attrs: {
+                        body: {
+                            stroke: 'black',
+                        },
+                    },
+                });
+            }
+        }
+
+        $(document).ready(function() {
+
+            //alert(joint.util.toKebabCase('aaaBbb'));
+            //$('#sample').colResizable({ liveDrag: true, minWidth: 50 });
+            $('#sample').colResizable({
+                liveDrag: true
+            });
+            /*
+                    $('p').on({
+                        click: function () {
+                            $('div').append('마우스가 문장을 클릭했습니다.<br>');
+                        },
+                        mouseenter: function () {
+                            $('div').append(
+                                '마우스가 커서가 문장 위로 들어왔습니다.<br>'
+                            );
+                        },
+                        mouseleave: function () {
+                            $('div').append(
+                                '마우스가 커서가 문장을 빠져 나갔습니다.<br>'
+                            );
+                        },
+                    });
+               */
+            $('#btnAdd').on('click', function() {
+                //alert(rect6.attr('label/text'));
+                //graph.clear();
+                rectSource = new joint.shapes.standard.Rectangle();
+                rectSource.position(100, 330);
+                rectSource.resize(100, 40);
+                rectSource.attr({
+                    body: {
+                        fill: 'blue',
+                    },
+                    label: {
+                        text: '노드1',
+                        fill: 'white',
+                    },
+                });
+
+                rectSource.processSeq = 1;
+                rectSource.addTo(graph);
+
+                rectArray.push(rectSource);
+
+                rectTarget = new joint.shapes.standard.Rectangle();
+                rectTarget.position(400, 330);
+                rectTarget.resize(100, 40);
+                rectTarget.attr({
+                    body: {
+                        fill: 'blue',
+                    },
+                    label: {
+                        text: '노드2',
+                        fill: 'white',
+                    },
+                });
+
+                rectTarget.processSeq = 2;
+                rectTarget.addTo(graph);
+
+                rectArray.push(rectTarget);
+
+                //console.log(rectArray.length);
+
+                /*
+                link10.remove();
+                rect.remove();
+                */
+            });
+
+            $('#btnRemove').on('click', function() {
+                //alert(rect6.attr('label/text'));
+                //graph.clear();
+
+                rectSource.remove();
+                rectTarget.remove();
+            });
+
+            $('#btnLinkAdd').on('click', function() {
+                //alert(rect6.attr('label/text'));
+                //graph.clear();
+                linkComm = new joint.shapes.standard.Link();
+
+                linkComm.source(rectSource);
+                linkComm.target(rectTarget);
+                linkComm.addTo(graph);
+            });
+
+            $('#btnLinkRemove').on('click', function() {
+                //alert(rect6.attr('label/text'));
+                //graph.clear();
+                //$('#btnRemove').trigger('click');
+
+                linkComm.remove();
+            });
+
+            $('#btnAllRemove').on('click', function() {
+                //alert(rect6.attr('label/text'));
+                //graph.clear();
+                $('#btnRemove').trigger('click');
+                $('#btnLinkRemove').trigger('click');
+            });
+
+            $('#btnManyLink').on('click', function() {
+                linkTemp = new joint.shapes.standard.Link();
+
+                linkTemp.source(rectSource);
+                linkTemp.target(rect6);
+                linkTemp.addTo(graph);
+            });
+
+            $('#btnClear').on('click', function() {
+                graph.clear();
+            });
+
+            var jsonObject = {};
+            $('#btnReCall').on('click', function() {
+
+                //console.log(rectArray.length);
+                for (var i = 0; i <= rectArray.length - 1; i++) {
+                    //console.log(rectArray[i]);
+                    rectArray[i].addTo(graph);
+                }
+
+                link3.source(rectArray[0]);
+                link3.target(rectArray[1]);
+                link3.addTo(graph);
+
+
+            });
+
+            $('#btnJsonSave').on('click', function() {
+
+                jsonString = JSON.stringify(graph.toJSON());
+                //console.log(jsonString);
+            });
+
+            $('#btnJsonCall').on('click', function() {
+
+                //graph.fromJSON(JSON.parse(jsonString));
+
+                //graph.fromJSON(jsonObject)
+
+
+            });
+
+            //console.log($('#p_id').text());
+            //console.log($('#p_id').html());
+        });
+
+        //console.log(document.implementation.hasFeature("w3.org/TR/SVG11/feature#Extensibility","1.1"));
+
+        /*
+        $(window).resize(function() {
+            var canvas = $('#modelCanvas');
+            paper.setDimensions(canvas.width(), canvas.height());
+        });
+        */
+
+        //paper.fitToContent({ useModelGeometry: true, allowNewOrigin: 'any', padding: 50 });
+
+        /*
+        var paperScroller = new joint.ui.PaperScroller({
+            autoResizePaper: true,
+            padding: 50,
+            paper: paper,
+            cursor: 'grab'
+        });
+        */
+    </script>
+
+    <br />
+    <button id="btnAdd">노드추가</button>
+    <button id="btnRemove">노드삭제</button>
+    <button id="btnLinkAdd">선추가</button>
+    <button id="btnLinkRemove">선만삭제</button>
+    <button id="btnAllRemove">노드및선삭제</button>
+    <button id="btnManyLink">이중연결</button>
+    <button id="btnClear">초기화</button>
+    <button id="btnReCall">불러오기</button>
+    <button id="btnJsonSave">JSON으로저장</button>
+    <button id="btnJsonCall">JSON에서불러오기</button>
+
+    <p id="p_id"><span style="font-size:16px;font-weight: bold;">NSJSoft</span> World!!!</p>
+    <div></div>
+    <table id="sample" border="1" width="100%">
+        <tr>
+            <td width="100">cell</td>
+            <td width="100">cell</td>
+            <td width="100">cell</td>
+        </tr>
+        <tr>
+            <td width="100">cell</td>
+            <td width="100">cell</td>
+            <td width="100">cell</td>
+        </tr>
+    </table>
+</body>
+
+</html>

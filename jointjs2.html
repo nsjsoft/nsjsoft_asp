@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신한 AI Vision 프로세스 관리</title>
+    
+    <!-- <style>
+       /* #content {
+            overflow:auto;
+        } */
+    </style> -->
+
+    <!-- <link rel="stylesheet" type="text/css" href="css/joint.css"/> -->
+    <link rel="stylesheet" type="text/css" href="/build/joint.css" />
+    <!-- <script src="/node_modules/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script> -->
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <!--<script src="/node_modules/lodash/lodash.js"></script>
+    <script src="/node_modules/backbone/backbone.js"></script>
+    <script src="/build/joint.js"></script> -->
+
+    <script src="js/lodash.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/joint.js"></script>
+    <!-- <script src="https://unpkg.com/@babel/polyfill@7.4.4/dist/polyfill.js"></script>
+
+        
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://resources.jointjs.com/demos/joint/node_modules/lodash/lodash.js"></script>
+    <script src="https://resources.jointjs.com/demos/joint/node_modules/backbone/backbone.js"></script>
+
+    <link href="https://resources.jointjs.com/demos/joint/build/joint.css" rel="stylesheet"/>
+    <script src="https://resources.jointjs.com/demos/joint/build/joint.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.js"></script>
+
+    <script type="text/babel">
+
+        const a = () => {
+
+                console.log("hello world");
+
+        }
+
+    </script>
+
+    <!-- code -->
+    <script type="text/javascript">
+
+        /*
+        jQuery.ajax({ cache: false });
+        jQuery.noConflict();
+        */
+        $(document).ready(function () {
+
+            //jQuery.noConflict();
+
+            // ================== 변수 선언 영역 ======================
+
+            var headNode = {};
+            var currNode = {};
+            var nodeArray = [];
+            var nodeArray2 = [];
+
+            var baseW = 100;
+            var baseH = 50;
+
+            var baseX = 50;
+            var baseY = 50;
+
+            var relX = 150;
+            var relY = 100;
+
+            var marginX = 30;
+            var marginY = 30;
+                        
+            var pos = 1;
+
+            var currX = 0;
+            var currY = 0;
+
+            //var maxX = 200;
+            var maxY = 50;
+
+            var currProcessSeq = 1;
+
+            // 노드구현
+            function Node() {
+                this.id = 0;
+                this.nodeNm = "";
+                this.processSeq = 0;
+                this.selfPos = 0;
+                this.childCnt = 0;
+                this.parentId = 0;                
+                this.parentNm = "";                
+            }
+            
+            var graph = new joint.dia.Graph();
+
+            var paper = new joint.dia.Paper({
+                    el: document.getElementById('content'),
+                    model: graph,
+                    width: 1250,
+                    height: 520,
+                    gridSize: 10,                   
+                    background: {
+                        color: 'rgba(255, 255, 255, 0.3)',
+                    },
+                    interactive: { elementMove: false, addLinkFromMagnet: false }
+            });            
+            
+            // ================== jointJs 이벤트 영역 ==================
+            paper.on('element:pointerclick', function (cellView) {
+
+                paper.findViewsInArea(paper.getArea()).forEach(function(cell) {
+                    
+                    cell.unhighlight(cell.el, {
+                        highlighter: {
+                            name: 'stroke',
+                            options: {
+                                padding: 10,
+                                rx: 5,
+                                ry: 5,
+                                attrs: {
+                                    'stroke-width': 5,
+                                    stroke: '#FF0000',
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                if (cellView.el.dataset.type == 'standard.Rectangle') {
+                    cellView.highlight(null, {
+                        highlighter: {
+                            name: 'stroke',
+                            options: {
+                                padding: 10,
+                                rx: 5,
+                                ry: 5,
+                                attrs: {
+                                    'stroke-width': 5,
+                                    stroke: '#FF0000',
+                                }
+                            }
+                        }
+                    });
+
+                    currNode = cellView.model;
+                    currProcessSeq = currNode.processSeq;
+                }
+
+                //console.clear();
+                //console.log(cellView.model.processSeq);
+                //console.log(cellView.id);
+            });
+
+            paper.on('cell:pointerdblclick', function (cellView) {
+                /*
+                var sName = cellView.model.attr('label/text');
+                console.log(sName);
+                if(sName == '노드1') {
+                    cellView.model.attr('label/text', '');
+                } else {
+                    cellView.model.attr('label/text', '');
+                }
+                */                
+            });
+
+            // ================== 사용자 정의함수 =====================
+            // 초기화
+            function fn_init() {
+
+                graph.clear();
+                
+                headNode = {};
+                currNode = {};
+                nodeArray = [];
+
+                pos = 1;
+
+                currX = 0;
+                currY = 0;
+                currProcessSeq = 1;
+
+                headNode = new joint.shapes.standard.Rectangle();
+                headNode.position(baseX, baseY);
+                headNode.resize(baseW, baseH);
+                headNode.attr({
+                    body: {
+                        fill: 'blue'
+                    },
+                    label: {
+                        text: '노드' + pos,
+                        fill: 'white'
+                    }
+                });
+
+                headNode.nodeNm = headNode.attr('label/text');
+                headNode.processSeq = 1;
+                headNode.childCnt   = 0;
+                headNode.selfPos    = 0;
+                headNode.parentId   = null;
+                headNode.parentNm   = null;
+
+                headNode.addTo(graph);
+
+                var cellView = paper.findViewByModel(headNode);
+                cellView.highlight(cellView.el, {
+                        highlighter: {
+                            name: 'stroke',
+                            options: {
+                                padding: 10,
+                                rx: 5,
+                                ry: 5,
+                                attrs: {
+                                    'stroke-width': 5,
+                                    stroke: '#FF0000',
+                                }
+                            }
+                        }
+                    });
+                    
+                 currNode = headNode;
+                 
+                 nodeArray = [];
+                
+                 var newNode = new Node();
+
+                 newNode.id = headNode.id;
+                 newNode.nodeNm = headNode.attr('label/text');
+                 newNode.processSeq = headNode.processSeq;
+                 newNode.selfPos = 1;
+                 newNode.childCnt = 0;
+                 newNode.parentId = null;
+                 newNode.parentNm = null;    
+
+                 nodeArray.push(newNode);
+            }       
+            
+            // 다시그리기
+            function fn_reDraw() {
+
+                var x = 50;
+                var y = 50;
+
+                var width = 100;
+                var height = 50;
+
+                var tmpRect = null;
+                graph.clear();
+                
+                console.clear();
+                
+                //for(var i = 0; i < nodeArray.length; i++) {
+                fn_reCursive(nodeArray[0]);
+
+                var rect = new joint.shapes.standard.Rectangle();
+                
+                console.log(tmpRect);
+                if( tmpRect != null) {
+                    curX = baseX + (relX * tmpRect.processSeq); // baseX 50, relX 150
+                    curY = tmpRect.get('position').y + 
+                           (tmpRect.childCnt == 1 ? 0 : (tmpRect.childCnt - 1) * 50) + 
+                           (tmpRect.childCnt == 1 ? 0 : marginY * (tmpRect.childCnt - 1));
+                } else {
+                    curX = baseX;
+                    curY = baseY;
+                }
+
+                rect.position(curX, curY);
+                rect.resize(baseW, baseH);
+                rect.attr({
+                    body: {
+                    fill: 'blue'
+                    },
+                    label: {
+                        text: nodeArray[i].nodeId,
+                        fill: 'white'
+                    }
+                });
+                
+                rect.processSeq = nodeArray[i].processSeq;
+                rect.childCnt   = nodeArray[i].childCnt;
+                rect.selfPos    = nodeArray[i].selfPos;
+                rect.parentId   = nodeArray[i].parentId;
+                
+                rect.addTo(graph);
+                
+                tmpRect = rect;
+
+                //}
+            }
+
+            // 재귀함수
+            function fn_reCursive(parentId, linkSrc, idx) {
+
+                var childNode = [];
+                var tmpMaxX = 0;
+
+                /*
+                childNode = nodeArray.filter(function(node){
+                    console.log(`${node.parentId} <=> ${parentId}`);
+                    return node.parent === parentId;
+                });
+                */
+               
+                childNode = _.filter(nodeArray, {'parentId' : parentId});
+
+                /*
+                console.log(`childNode=>${childNode}`);
+                console.log(`idx => ${idx}`);
+                */
+
+                if (childNode.length == 0) return true;  
+                
+                tmpMaxX = baseX + (relX * idx)
+                //maxX += 150;
+
+                for(var i=0; i<childNode.length; i++) {
+                  
+                    // console.log(`childNode nodeNm => ${childNode[i].nodeNm}`);
+                    // console.log(`tmpMaxX => ${tmpMaxX}`);
+
+                    if (i > 0) maxY += 80;
+
+                    var rectSource = new joint.shapes.standard.Rectangle();
+                    rectSource.position(tmpMaxX, maxY);
+                    
+                    // console.log(`rectSource X => ${rectSource.get('position').x}`);
+                    // console.log(`rectSource Y => ${rectSource.get('position').y}`);
+
+                    rectSource.resize(baseW, baseH);
+                    rectSource.attr({
+                        body: {
+                            fill: 'blue',
+                        },
+                        label: {
+                            //text: '자식' + '-' + parseInt(i + 1),
+                            text: childNode[i].nodeNm,
+                            fill: 'white',
+                        },
+                    });
+
+                    rectSource.addTo(graph);
+
+                    var link = new joint.shapes.standard.Link({
+                        router: { name: 'manhattan' },
+                        attrs: {
+                            line: {
+                                stroke: '#333333',
+                                strokeWidth: 3
+                            }
+                        }
+                    });
+
+                    link.source(linkSrc);
+                    link.target(rectSource);
+                    link.addTo(graph);
+
+                    fn_reCursive(childNode[i].id, rectSource, idx + 1);
+
+                }
+            }
+
+            // 부모노드찾기
+            function fn_parentSearch(id) {
+                
+                return idx = _.findIndex(nodeArray, {'id' : id});
+            }
+
+            // 배열요소삭제
+            function fn_arrDel(id) {
+                console.log(id);
+                const idx = _.findIndex(nodeArray, {'id' : id});
+                // console.log(`arrDel idx => ${idx}`);
+                nodeArray.splice(idx, 1);
+                currNode.remove();
+            }
+
+            function sleep(num) {	//[1/1000초]
+                var now = new Date();
+                var stop = now.getTime() + num;
+
+                while(true){
+                    now = new Date();
+                    if(now.getTime() > stop) return;
+                }
+             }
+
+            // ==================== 화면 컴포넌트 이벤트 ==================
+            // 노드추가
+            $('#btnAdd').on('click', function () {
+                    
+                var childX = 0;
+                var childY = 0;
+
+                console.clear();    
+                // console.log(`currNode.x => ${currNode.get('position').x}`);
+                // console.log(`currNode.y => ${currNode.get('position').y}`);
+
+                currNode.childCnt += 1;
+                childX = baseX + (relX * currNode.processSeq); // baseX 50, relX 150
+                childY = currNode.get('position').y + 
+                         (currNode.childCnt == 1 ? 0 : (currNode.childCnt - 1) * 50) + 
+                         (currNode.childCnt == 1 ? 0 : marginY * (currNode.childCnt - 1));
+
+                // console.log(`id => ${currNode.id}`);
+                // console.log(`nodeNm => ${currNode.nodeNm}`);
+                // console.log(`childCnt = ${currNode.childCnt}`);
+                // console.log(`parentId   => ${currNode.parentId}`);
+                // console.log(`parentNm   => ${currNode.parentNm}`);
+                // console.log(`childX = ${childX}`);
+                // console.log(`childY = ${childY}`);                
+                console.log('==============');
+
+                var rectSource = new joint.shapes.standard.Rectangle();
+                rectSource.position(childX, childY);
+                rectSource.resize(baseW, baseH);
+                rectSource.attr({
+                    body: {
+                    fill: 'blue',
+                    },
+                    label: {
+                        text: (currNode.processSeq == 1 ? '자식' : currNode.attr('label/text')) + '-' + currNode.childCnt,
+                        fill: 'white',
+                    },
+                });
+
+                rectSource.nodeNm = rectSource.attr('label/text');
+                rectSource.processSeq = currProcessSeq + 1;
+                rectSource.childCnt = 0;
+                rectSource.selfPos   = currNode.childCnt;
+                rectSource.parentId = currNode.id;
+                rectSource.parentNm = currNode.attr('label/text');
+
+                var newNode = new Node();
+
+                newNode.id = rectSource.id;
+                newNode.nodeNm = rectSource.attr('label/text');
+                newNode.processSeq = rectSource.processSeq;
+                newNode.selfPos = rectSource.selfPos;
+                newNode.childCnt = rectSource.childCnt;
+                newNode.parentId = rectSource.parentId;
+                newNode.parentNm = rectSource.parentNm;
+
+                nodeArray.push(newNode);
+
+                console.log(currNode.attr('label/text'));
+                var idx = _.findIndex(nodeArray, {'id' : currNode.id});
+                // console.log(`idx => ${idx}`);
+                nodeArray[idx].childCnt += 1;
+                
+                rectSource.addTo(graph);               
+
+                link = new joint.shapes.standard.Link({
+                    router: { name: 'manhattan' },
+                    //connector: { name: 'rounded' },
+                    attrs: {
+                        line: {
+                            stroke: '#333333',
+                            strokeWidth: 3
+                        }
+                    }
+                });
+
+                if (currNode.processSeq == 1) {
+                    var cellView = paper.findViewByModel(headNode);
+                    cellView.unhighlight(cellView.el, {
+                            highlighter: {
+                                name: 'stroke',
+                                options: {
+                                    padding: 10,
+                                    rx: 5,
+                                    ry: 5,
+                                    attrs: {
+                                        'stroke-width': 5,
+                                        stroke: '#FF0000',
+                                    }
+                                }
+                            }
+                        });
+                }
+
+                link.source(currNode);
+                link.target(rectSource);
+                link.addTo(graph);
+
+                if (currNode.processSeq == 1) {
+                    var cellView = paper.findViewByModel(headNode);
+                    cellView.highlight(cellView.el, {
+                            highlighter: {
+                                name: 'stroke',
+                                options: {
+                                    padding: 10,
+                                    rx: 5,
+                                    ry: 5,
+                                    attrs: {
+                                        'stroke-width': 5,
+                                        stroke: '#FF0000',
+                                    }
+                                }
+                            }
+                        });
+                }
+
+                //console.log(rectSource.processSeq);
+                
+            });
+    
+            // 현재노드 보기
+            $('#btnCurr').on('click', function () {
+                console.clear();
+
+                //console.log(`id = ${currNode.cid}`);
+                //console.log(`id = ${currNode.cid.substring(1)}`);
+
+                // console.log(`id => ${currNode.id}`);
+                // console.log(`nodeNm => ${currNode.nodeNm}`);
+                // console.log(`currNode.processSeq => ${currNode.processSeq}`);
+                // console.log(`currNode.selfPos    => ${currNode.selfPos}`);
+                // console.log(`currNode.childCnt   => ${currNode.childCnt}`);
+                // console.log(`currNode.parentId   => ${currNode.parentId}`);
+                // console.log(`currNode.parentNm   => ${currNode.parentNm}`);
+
+                // console.log(`currNode.x => ${currNode.get('position').x}`);
+                // console.log(`currNode.y => ${currNode.get('position').y}`);
+                
+                console.log('=============');
+                   
+            });
+
+            // 삭제
+            $('#btnDel').on('click', function () {
+
+               if (currNode.childCnt > 0) {
+                   alert('자식이 있으면 삭제할 수 없습니다!');
+                   return false;
+               }
+               
+               console.clear();
+
+               // 부모의 자식갯수를 -1
+               var idx = fn_parentSearch(currNode.parentId);
+               nodeArray[idx].childCnt--;
+
+            //    console.log(`fn_parentSearch idx => ${idx}`);
+
+               var tmp = graph.getCell(currNode.parentId);
+               tmp.childCnt--;
+
+               // 배열에서 요소삭제               
+               fn_arrDel(currNode.id);               
+
+            });
+
+            // 배열보기
+            $('#btnShowArray').on('click', function () {
+                console.clear();
+                console.log(nodeArray);
+                // console.log(`length => ${nodeArray.length}`);
+                console.log('=====================');
+            });
+
+            // 배열정렬
+            $('#btnSortArray').on('click', function () {
+               _.sortBy(nodeArray, 'processSeq');
+               console.clear();
+               console.log(nodeArray);
+            });
+            
+            // 다시그리기
+            $('#btnReDraw').on('click', function () {
+                reDraw();
+            });
+
+            // 초기화
+            $('#btnClear').on('click', function () {
+                graph.clear();
+
+                fn_init();
+            });
+
+            // 속성보기
+            $('#btnKeyView').on('click', function () {
+
+                console.clear();
+
+                var tmp = graph.getCell(currNode.id);
+                var ptmp = graph.getCell(currNode.parentId);
+
+                for(var key in tmp.model) {
+                    // console.log(`${key} => ${tmp[key]}`);
+                }
+
+                console.log('==========================');
+
+                for(var key in ptmp.model) {
+                    // console.log(`${key} => ${tmp[key]}`);
+                }
+                
+            });
+
+            // 배열에서그리기
+            $('#btnArrToDraw').on('click', function () {
+                graph.clear();
+
+                const tmpArr = _.filter(nodeArray, { 'processSeq': 2 });
+
+                fn_reCursive(nodeArray[0].id);
+            });
+
+            // 테스트
+            $('#btnTest').on('click', function () {
+
+                console.clear();
+
+                //var tmp = graph.getCell(currNode.parentId);
+                //var tmp2 = joint.util.getElementBBox(tmp);
+
+                //console.log(tmp.nodeNm);
+
+                //var tmp = graph.getCell(currNode.id);
+                //const idx = _.findIndex(nodeArray, {'id' : currNode.id});
+                //console.log(`idx => ${idx}`);
+
+                /*
+                for(var key in tmp.model) {
+                    console.log(`${key} => ${tmp[key]}`);
+                }
+                */
+                /*
+                const tmpArr = _.filter(nodeArray, { 'processSeq': 2 });
+                console.log(tmpArr);
+
+                for(var i=0; i<nodeArray.length-1; i++) {
+
+                    fn_reDraw();
+                    if (tmpArr.childCnt > 0) { 
+                        // 재귀함수
+                        fn_reCursive(tmpArr.id);
+                    }    
+                }
+                */
+
+                /*
+                const tmpArr = _.filter(nodeArray, {'parentId' : parentId});
+
+                for(var i=0; i<tmpArr.length; i++) {
+                
+                }
+
+                if(id.childCnt > 0) {
+                    fn_reCursive(id.parentId);
+                }
+                */
+
+                /*
+                nodeArray.filter(function(node){
+                    console.log(`${node.parentId} <=> ${parentId}`);
+                    return node.parent === parentId;
+                }).forEach(function(node){
+                   console.log(`node`);
+                   fn_reCursive(nodeArray, node.id);
+                });
+                */
+
+                // graph.clear();
+                
+                // nodeArray2 = [];
+
+                // const tmpHead = _.filter(nodeArray, { 'processSeq': 1 });
+
+                // console.log(tmpHead[0].id);
+                
+                // headNode.remove();
+
+                // headNode = new joint.shapes.standard.Rectangle();
+                // headNode.position(baseX, baseY);
+                // headNode.resize(baseW, baseH);
+                // headNode.attr({
+                //     body: {
+                //         fill: 'blue',
+                //     },
+                //     label: {
+                //         text: '노드' + pos,
+                //         fill: 'white',
+                //     },
+                // });
+
+                // headNode.nodeNm = headNode.attr('label/text');
+                // headNode.processSeq = 1;
+                // headNode.selfPos    = 0;
+                // headNode.childCnt   = 0;
+                // headNode.parentId   = null;
+                // headNode.parentNm   = null;
+
+                // headNode.addTo(graph);
+
+                // var newNode = new Node();
+
+                // newNode.id = headNode.id;
+                // newNode.nodeNm = headNode.attr('label/text');
+                // newNode.processSeq = headNode.processSeq;
+                // newNode.selfPos = headNode.selfPos;
+                // newNode.childCnt = headNode.childCnt;
+                // newNode.parentId = headNode.parentId;
+                // newNode.parentNm = headNode.parentNm;
+
+                // nodeArray2.push(newNode);
+                
+                // console.log(nodeArray2);
+
+                graph.clear();
+
+                //sleep(3000);               
+                
+                headNode = {};
+                currNode = {};
+                
+                currX = 0;
+                currY = 0;
+                currProcessSeq = 1;
+
+                headNode = new joint.shapes.standard.Rectangle();
+                headNode.position(baseX, baseY);
+                headNode.resize(baseW, baseH);
+                headNode.attr({
+                    body: {
+                        fill: 'blue'
+                    },
+                    label: {
+                        text: '노드' + pos,
+                        fill: 'white'
+                    }
+                });
+
+                // console.log(`headNode.fontSize => ${headNode.attr('label/fontSize')}`);
+
+                headNode.addTo(graph);
+
+                currNode = headNode;  
+                
+                nodeArray[0].id = headNode.id; 
+                nodeArray[0].childCnt = 0;
+                 
+                const tmpArr = _.filter(nodeArray, { 'processSeq': 2 });
+                console.log(tmpArr.length);                
+                               
+                var tmpRect = graph.getCell(headNode.id);
+                
+                //console.log(`tmpRect X => ${tmpRect.get('position').x}`);
+                //console.log(`tmpRect Y => ${tmpRect.get('position').y}`);
+                
+                maxY = baseY;
+
+                for(var i = 0; i < tmpArr.length; i++) {
+                    
+                    //maxX = baseX + relX;
+
+                    nodeArray[0].childCnt++;
+
+                    var childX = 0;
+                    var childY = 0;
+
+                    childX = baseX + relX; // baseX 50, relX 150
+                    childY = maxY; 
+
+                    var rectSource = new joint.shapes.standard.Rectangle();
+                    rectSource.position(childX, childY);
+                    //console.log(`tmpRect X => ${rectSource.get('position').x}`);
+                    //console.log(`tmpRect Y => ${rectSource.get('position').y}`);
+
+                    rectSource.resize(baseW, baseH);
+                    rectSource.attr({
+                        body: {
+                            fill: 'blue',
+                        },
+                        label: {
+                            //text: '자식' + '-' + parseInt(i + 1),
+                            text: tmpArr[i].nodeNm,
+                            fill: 'white'                           
+                        }
+                    });
+                    
+                    rectSource.addTo(graph);
+
+                    link = new joint.shapes.standard.Link({
+                        router: { name: 'manhattan' },
+                        //connector: { name: 'rounded' },
+                        attrs: {
+                            line: {
+                                stroke: '#333333',
+                                strokeWidth: 3
+                            },
+                            '.marker-target': { d: 'M 30 30 L 0 5 L 10 10 z', fill: '#6a6c8a', stroke: '#6a6c8a' },
+                            '.connection': { stroke: '#6a6c8a', 'stroke-width': 2 }
+                        },                        
+                    });
+
+                    link.source(headNode);
+                    link.target(rectSource);
+                    link.addTo(graph);                                       
+
+                    console.log(tmpArr[i].id);
+                    fn_reCursive(tmpArr[i].id, rectSource, 2);
+
+                    maxY += 80;
+                }
+                // element.attr('body/fill', 'red');
+                // element.attr(['label', 'fontSize'], 12);
+                // // Note: an equivalent expression is also
+                // element.prop('attrs/label/fontSize', 12);
+                // doubleLink.attr('line/stroke', '#30d0c6');
+
+                // var headeredRectangle = new joint.shapes.standard.HeaderedRectangle();
+                // headeredRectangle.resize(150, 100);
+                // headeredRectangle.position(25, 610);
+                // headeredRectangle.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+                // headeredRectangle.attr('header/fill', 'lightgray');
+                // headeredRectangle.attr('headerText/text', 'Header');
+                // headeredRectangle.attr('bodyText/text', 'Headered\nRectangle');
+                // headeredRectangle.addTo(graph);
+
+                // var inscribedImage = new joint.shapes.standard.InscibedImage();
+                // inscribedImage.resize(150, 100);
+                // inscribedImage.position(225, 410);
+                // inscribedImage.attr('root/title', 'joint.shapes.standard.InscribedImage');
+                // inscribedImage.attr('label/text', 'Inscribed Image');
+                // inscribedImage.attr('border/strokeWidth', 5);
+                // inscribedImage.attr('background/fill', 'lightgray');
+                // inscribedImage.attr('image/xlinkHref', 'image.png');
+                // inscribedImage.addTo(graph);
+
+                // link.attr('rectSelector', { atConnectionLengthIgnoreGradient: 30, width: 10, height: 10, fill: 'red' });
+            });
+
+            fn_init();
+            
+        });
+
+    </script>
+</head>
+<body>
+    <!-- content -->
+    <div id="content" style="border: 5px solid #0099ff;margin:10px;overflow:auto;"></div>
+    <button id="btnAdd" style="margin:5px 11px;">노드추가</button>
+    <button id="btnCurr" style="margin:5px 5px;">현재노드</button>
+    <button id="btnDel" style="margin:5px 5px;">노드삭제</button>
+    <button id="btnShowArray" style="margin:5px 5px;">배열보기</button>
+    <button id="btnSortArray" style="margin:5px 5px;">배열정렬</button>
+    <button id="btnReDraw" style="margin:5px 5px;">다시그리기</button>
+    <button id="btnClear" style="margin:5px 5px;">초기화</button>
+    <button id="btnKeyView" style="margin:5px 5px;">속성보기</button>
+    <button id="btnArrToDraw" style="margin:5px 5px;">배열에서그리기</button>
+    <button id="btnTest" style="margin:5px 5px;">테스트</button>
+
+    <!-- <script src="js/jquery.js"></script>
+    <script src="js/lodash.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/joint.js"></script> -->
+    
+</body>
+</html>
