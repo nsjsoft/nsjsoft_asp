@@ -24,10 +24,11 @@
   'Response.ContentType="text/html;charset=utf-8"
 
 Dim conn : Set conn = Server.CreateObject("ADODB.Connection")
+
 If IsObject(conn) Then
-    Response.Write("객체입니다.<br>")
+   Response.Write("객체입니다.<br>")
 Else
-    Response.Write("객체가 아닙니다.<br>")
+   Response.Write("객체가 아닙니다.<br>")
 End If
 'Provider=SQLOLEDB;User ID=아이디;Password=패스워드;Initial Catalog=데이터베이스이름;Data Source=데이터베이스서버이름"
 str = "Provider=SQLOLEDB;User ID=uwizconv2;Password=upwd20#@3;Initial Catalog=OrpWiselection;Data Source=wfdbsvr.database.windows.net"
@@ -106,13 +107,13 @@ If Not (objRs.BOF OR objRs.EOF) Then
     Wend
 End IF
 
-Dim arrKey : arrKey = objDic.Keys
-Dim arrItem : arrItem = objDic.Items
+Dim arrKey2 : arrKey2 = objDic.Keys
+Dim arrItem2 : arrItem2 = objDic.Items
 Dim tmpArr
 For i = 0 To objDic.Count - 1
-    'Response.Write arrKey(i) & " : " & arrItem(i) & "<br>" & Chr(13)
-    tmpArr = objDic.Item(arrKey(i))
-    Response.Write tmpArr(0) & "=" & Lbound(tmpArr) & "=" & Ubound(tmpArr) & "<br>"
+    'Response.Write arrKey2(i) & " : " & arrItem(i) & "<br>" & Chr(13)
+    tmpArr = objDic.Item(arrKey2(i))
+    Response.Write tmpArr(0) & "2=" & Lbound(tmpArr) & "=" & Ubound(tmpArr) & "<br>"
 Next
 
 'Response.Write objDic.Count & "<br>"
@@ -122,15 +123,15 @@ Dim objCrt_Dic : Set objCrt_Dic = Server.CreateObject("Scripting.Dictionary")
 objCrt_Dic.Add 1, "nsjsoft"
 'objCrt_Dic.Add 1, "nsj"
 arrKey = objCrt_Dic.Keys
-Response.Write arrKey(0) & "<br>"
+Response.Write arrKey2(0) & "<br>"
 Response.Write objCrt_Dic.Item(1) & "<br>"
-Response.Write "varType : " & varType(arrKey(0)) & "<br>"
+Response.Write "varType : " & varType(arrKey2(0)) & "<br>"
 
 objCrt_Dic.Key(1) = "1"
-arrKey = objCrt_Dic.Keys
-Response.Write arrKey(0) & "<br>"
+arrKey2 = objCrt_Dic.Keys
+Response.Write arrKey2(0) & "<br>"
 Response.Write objCrt_Dic.Item("1") & "<br>"
-Response.Write "varType : " & varType(arrKey(0)) & "<br>"
+Response.Write "varType : " & varType(arrKey2(0)) & "<br>"
 
 Response.Write Right("00" & hour(time()), 2) & "<br>"
 Response.Write Year(date()) & Right("00" & month(date()), 2) & Right("00" & day(date()), 2)
@@ -200,10 +201,58 @@ IF ls_el <> "" Then
    Response.Write ls_el & "<br>"
 End If
 
+
 ReDim paramInfo(2)
+
+Dim as_slotIdx : as_slotIdx = 90685
+Dim as_twcode : as_twcode = "P0013"
+
 paramInfo(0) = DBHelper.MakeParam("@SLOT_IDX", adInteger , adParamInput,  , as_slotIdx)
 paramInfo(1) = DBHelper.MakeParam("@TW_CODE" , adVarWChar, adParamInput, 5, as_twcode)
 paramInfo(2) = DBHelper.MakeParam("@OPT"     , adVarWChar, adParamInput, 1, "S") 'TW_SEQ:고유번호'
+
+Set objRs = DBHelper.ExecSPReturnRS("usp_Web_eTest_Get_Answer_Check_FJson", paramInfo, Nothing)
+Dim objDicTemp : Set objDicTemp = Server.CreateObject("Scripting.Dictionary")
+Dim ls_answerStr, ls_seq, ls_ans
+If Not (objRs.BOF OR objRs.EOF) Then
+    While Not objRs.EOF
+        ls_seq = "" & objRs("NUM") & ""
+        ls_ans = objRs("ANSWER")
+    
+        objDicTemp.Add ls_seq, ls_ans
+
+        objRs.MoveNext
+    WEnd
+End IF
+
+Dim key, value
+Response.Write "========================================" & chr(13) & "</br>"
+For Each key In objDicTemp
+    'Response.Write key & "=" & objDic.item(key) & "</br>"
+    value = objDicTemp.Item(key)
+    Response.Write key & "=>" & value & "</br>"
+Next
+Response.Write "========================================" & chr(13) & "</br>"
+
+Response.Write "objDicTemp.Count=>" & objDicTemp.Count & "<br>"
+
+Dim arrKey3 : arrKey3 = objDicTemp.Keys
+Dim arrItem3 : arrItem3 = objDicTemp.Items
+For i = 0 To objDicTemp.Count - 1
+    Response.Write arrKey3(i) & "<br>"
+    Response.Write arrItem3(i) & "<br>"
+Next
+
+Response.Write "========================================" & chr(13) & chr(13) & "</br>"
+
+IF objDicTemp.Exists("123") THEN
+   Response.Write "objDicTemp에 값존재=>" & objDicTemp.Item("123") & "<br>"
+ELSE
+   Response.Write "objDicTemp에 값존재하지 않음<br>"
+END IF
+
+'objDicTemp.Remove(key)
+objDicTemp.RemoveAll
 
 Dim ls_sys, idx
 ls_sys = "L048:1//////"
@@ -218,11 +267,13 @@ Next
 ls_tmp = (2*-11.9)--4.6+-12.0
 
 execute("li_cal  = CDBL(FormatNumber(" & ls_tmp & " + 0, 5))")
-Response.write  "li_cal=>" & li_cal & "<br>"
-
+Response.write  "<br>li_cal=>" & li_cal & "<br>"
+Dim TWQ_SEQ : TWQ_SEQ = 1
+Response.write "TWQ_SEQ=>" & "" & TWQ_SEQ & ""
 %>
 
 <script>
+
     var foo = { key : 'value'};
     var bar = _.clone(foo);
     foo.key = 'other value';
