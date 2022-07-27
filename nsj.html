@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <title>jQuery</title>
+    <style>
+        .a {
+            color: red;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/joint.css" />
+    <script src="js/jquery.js"></script>
+    <script src="js/lodash.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/joint.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            console.clear();
+
+            $('ol').each(function() {
+
+                console.log($('li', this).length);
+
+                if ($('li', this).length > 2) {
+                    $(this).addClass('a');
+                }
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <ol>
+        <li>One</li>
+        <li>Two</li>
+    </ol>
+    <ol>
+        <li>One</li>
+        <li>Two</li>
+        <li>Three</li>
+    </ol>
+</body>
+
+</html>

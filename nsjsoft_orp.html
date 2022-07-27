@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+    <script src="es6.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $("tr").click(function(event) {
+                if (event.target.type == 'checkbox')
+                    return;
+
+                // TODO tr 눌렀을 때 취할 행동. 물론 실무에선 selecter 를 더 한정적으로 써야함
+            });
+
+            $(":checkbox").change(function(event) {
+                // TODO checkbox 눌렀을 때 취할 행동
+            });
+
+            $("tr").click(function(event) {
+
+            });
+
+            $(":checkbox").click(function(event) {
+                event.stopPropagation();
+            });
+
+            $('#TableID').delegate('tr', 'click', function(event) {
+                if ($(event.target).is('input:checkbox')) {} else {}
+            });
+
+            $("input:checkbox[name='checkboxFamily']").change(function() {
+                console.log("checkbox changed .. value : " + $(this).val());
+                //TODO
+            });
+
+            $("input:radio[name=radioFamily]").click(function() {
+                $("input:checkbox[id='box1']").prop("checked", true);
+            });
+
+            $("input:radio[name=radioFamily]").click(function() {
+                $("input:checkbox[id='box1']").prop("checked", true);
+                $("input:checkbox[id='box1']").change();
+            });
+
+            $("#btn").click(function(event) {
+                // 실행하고자 하는 jQuery 코드 
+            });
+
+            $("#btn").bind("click", function(event) {
+                // 실행하고자 하는 jQuery 코드 
+            });
+
+            $("#btn").on("click", function(event) {
+                // 실행하고자 하는 jQuery 코드 
+            });
+
+            $("body").on({
+                "click": function(event) {
+                    // 실행하고자 하는 jQuery 코드 
+                }
+            }, "#btn");
+
+            $("body").on("click", "#btn", function(event) {
+                // 실행하고자 하는 jQuery 코드 
+            });
+
+
+            // $("p").on("mouseenter mouseleave", function() {
+            //     $("div").append("마우스 커서가 문장 위로 들어오거나 빠져 나갔습니다.<br>");
+            // });
+
+            // $("p").on({ 
+            //     click: function() {
+            //         $("div").append("마우스가 문장을 클릭했습니다.<br>");
+            //     },
+            //     mouseenter: function() {
+            //         $("div").append("마우스가 커서가 문장 위로 들어왔습니다.<br>");
+            //     },
+            //     mouseleave: function() {
+            //         $("div").append("마우스가 커서가 문장을 빠져 나갔습니다.<br>");
+            //     }
+            // });
+
+            $("#btn").on("click", function() {
+                $("#btn").off("click").text("버튼 클릭 불가능");
+            });
+
+            $("#btn").one("click", function() {
+                $("div").append("이제 클릭이 되지 않습니다.<br>");
+            });
+
+        });
+
+        var target = document.getElementById("searchYear");
+        var good_a = ["지수", "제니", "로제", "리사"];
+        //객체사용
+        for (var x in good_a) {
+            console.log(x + "=>" + good_a[x]);
+        }
+
+        console.log("===========================");
+        var obj = {
+            a: '가',
+            b: '나',
+            c: '다'
+        };
+        for (var key in obj) {
+            console.log(key, obj[key]);
+        }
+
+        console.log("===========================");
+        for (var y of good_a) {
+            console.log(y);
+        }
+
+        console.log("===========================");
+        good_a.forEach(function(item, index, arr2) {
+            console.log(item, index, arr2[index]);
+        })
+
+        function test() {
+            console.log("===========================");
+
+            var idx = document.getElementById("searchYear").selectedIndex;
+            console.log(idx);
+
+            var tmp = document.getElementById("searchYear").options[idx].value;
+            console.log(tmp);
+
+            tmp = document.getElementById("searchYear").options[idx].text;
+            console.log(tmp);
+
+            tmp = document.getElementById("searchYear").options[idx].index;
+            console.log(tmp);
+
+        }
+    </script>
+</head>
+
+<body>
+    <select name="searchYear" id="searchYear" onchange="">
+        <option value="2019">2019</option>
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+    </select>
+    <br>
+    <button id="btn" onclick="test()">버튼</button>
+    <br>
+    <input type="checkbox" id="box1" name="checkboxFamily">
+    <input type="checkbox" id="box2" name="checkboxFamily">
+    <input type="checkbox" id="box3" name="checkboxFamily">
+    <input type="checkbox" id="box4" name="checkboxFamily">
+    <br>
+    <input type="radio" id="radio1" name="radioFamily" value="S">
+    <input type="radio" id="radio2" name="radioFamily" value="H">
+    <input type="radio" id="radio3" name="radioFamily" value="K">
+    <p>
+        ㅎㅎㅎ
+    </p>
+    <script>
+        var divsBubble = document.querySelectorAll('div');
+        divs.forEach(function(div) {
+            div.addEventListener('click', logEventBubble);
+        });
+
+        function logEventBubble(event) {
+            event.stopPropagation();
+            console.log(event.currentTarget.className);
+        }
+
+        var divsCapture = document.querySelectorAll('div');
+        divsCapture.forEach(function(div) {
+            divsCapture.addEventListener('click', logEventCapture, {
+                capture: true // default 값은 false입니다.
+            });
+        });
+
+        function logEventBubble(event) {
+            event.stopPropagation();
+            console.log(event.currentTarget.className);
+        }
+
+        var inputs = document.querySelectorAll('input');
+        inputs.forEach(function(input) {
+            input.addEventListener('click', function(event) {
+                alert('clicked');
+            });
+        });
+
+        // 새 리스트 아이템을 추가하는 코드
+        var itemList = document.querySelector('.itemList');
+
+        var li = document.createElement('li');
+        var input = document.createElement('input');
+        var label = document.createElement('label');
+        var labelText = document.createTextNode('이벤트 위임 학습');
+
+        input.setAttribute('type', 'checkbox');
+        input.setAttribute('id', 'item3');
+        label.setAttribute('for', 'item3');
+        label.appendChild(labelText);
+        li.appendChild(input);
+        li.appendChild(label);
+        itemList.appendChild(li);
+
+        var itemList = document.querySelector('.itemList');
+        itemList.addEventListener('click', function(event) {
+            alert('clicked');
+        });
+    </script>
+    <div class="one">
+        <div class="two">
+            <div class="three">
+            </div>
+        </div>
+    </div>
+
+    <h1>오늘의 할 일</h1>
+    <ul class="itemList">
+        <li>
+            <input type="checkbox" id="item1">
+            <label for="item1">이벤트 버블링 학습</label>
+        </li>
+        <li>
+            <input type="checkbox" id="item2">
+            <label for="item2">이벤트 캡쳐 학습</label>
+        </li>
+    </ul>
+
+    <a href="link.html">링크</a>
+
+    <script>
+        $("a").click(function(e) {
+            e.preventDefault();
+            //내가 하고싶은거
+            alert('링크 방지닷!');
+        });
+
+        function allcheck() {
+            var checkbox = event.srcElement; // allcheck()란 이벤트 핸들러에게 이벤트를 발생시킨 객체를 checkbox안에 담는다.
+            if (checkbox.checked) { // 만약 호출한 inputBox에 checked 면  
+                allBoxCheck(true); // 모든박스 inputBox를 체크한다. allBoxCheck()함수는 아래에 정의
+            } else {
+                allBoxCheck(false); //체크가 안 되어 있으면 모두 체크 해제.,//끝!!
+            }
+        }
+
+        function allBoxCheck(val) { //위의 allcheck()함수에서 사용한다.
+            var allInput = document.all.tags("INPUT"); //문서의 모든 태그중 "INPUT"이라고 한거를 다 allInput 에 담는다.
+            for (var i = 0; i < allInput.length; i++) { //그 담은 길이 만큼 돌아~   돌~리고~~ 돌리~고~
+                var input = allInput[i]; //그 각각의 allInput의[i]번째를 input에 담아
+                if (input.type == "checkbox") { //그 input의 type이 checkbox인지를 비교한다
+                    input.checked = val; //checkBox가 맞은면 checked에 val을 대입한다.
+                } //val은 allcheck()에서 호출시allBoxCheck(true & false)지정!!
+            }
+        }
+
+        // 큰제목 전체선택 아래 소제목 전체 선택하기
+        function childCheck() {
+            var input = event.srcElement; //현재childCheck()함수를 부른 이벤트를 input 에 담는다.값은alert(event.srcElement);              //[object]가 찍힌다.
+            var checked = input.checked //input박스가 체크되어 있으면 true 아니면 false반환한다.
+
+            alert(input.checked); // true or false 가 찍힌다.
+            var td = input.parentElement; // input의 부모(input을 감싼 태그를 말한다)는 td
+            var tr = td.parentElement; // td의 부모(위 td 를 감싼 태그를 말한다)는 tr
+            var index = tr.rowIndex; // 그래서 그 tr의 로우 (몇번째 행인지)를 찾는다.
+
+            alert(tr.rowIndex); // 해당 로우가 찍힌다.
+            if (index < 3) return; // 나는 3번째 로우 부터 선택 하므로 3번째 이전의 로우는 리턴
+            var checkTable = document.all.checkTable; // 모든 checkTable을 담는다[]
+            var targetTable = checkTable[index - 3]; // 거기서3번째를 찾아 담는다
+            var targetInput = targetTable.getElementsByTagName("INPUT"); //3번째에서"INPUT"을 찾아 담는다.
+            for (var i = 0; i < targetInput.length; i++) { //targetInput 배열에 담긴 모든 input을 하나씩 뺀다.
+                var input = targetInput[i]; //targetInput의[i]번째 input을 input에 담고  
+                if (input.type == "checkbox") { //그 input 의 type이 checkbox인지를 비교한다.
+                    input.checked = checked; //input.checked 를 checked로 설정...//  끝!!
+                }
+            }
+
+            $('table').on('click', 'td', function(event) {
+
+                if ($(event.target).is('input[type=checkbox]')) {
+                    return;
+                }
+
+                // Logic here
+            });
+
+            var checkbox = $("input[name=checkboxName]:checked");
+
+            var col1 = "";
+            var col2 = "";
+            var col3 = "";
+            var col4 = "";
+
+            checkbox.each(function(i) {
+                var tr = checkbox.parent().parent().eq(i); // checkbox 태그의 두 단계 상위 태그가 tr이기 때문에
+                var td = tr.children(); // td 태그는 tr 태그의 하위에 있으므로
+
+                col1 = td.eq(1).text(); // 1번째 column(eq(0))은 체크박스 이므로 eq(1)부터 데이터를 받아줌
+                col2 = td.eq(2).text();
+                col3 = td.eq(3).text();
+                col4 = td.eq(4).text();
+            });
+            $('h1').css('background', '#C9C9C9').filter(':even').css('color', 'red').end().filter(':odd').css('color', 'blue');
+
+            $('h1').first().css('color', 'red');
+            $('h1').last().css('color', 'blue');
+            $('h1').eq(2).css('background', '#C9C9C9');
+
+            $('tr:eq(0)').css('background', '#000000').css('color', '#FFFFFF');
+            $('td:nth-child(2n+1)').css('background', '#565656');
+            $('td:nth-child(2n)').css('background', '#F9F9F9');
+
+            /*
+            $('p#zero:checkbox');
+            $('#zero, .nero, p')
+
+                요소:contains(문자열)
+
+                특정 문자열을 포함하는 문서 객체를 선택 
+
+                요소:eq(n) 
+
+                n번째에 위치하는 문서 객체를 선택 
+
+                요소:gt(n) 
+
+                n번째 초과에 위치하는 문서 객체를 선택 
+
+                요소:has(h1) 
+
+                h1 태그가 있는 문서 객체를 선택 
+
+                요소:lt(n) 
+
+                n번째 미만에 위치하는 문서 객체를 선택 
+
+                요소:not(선택자) 
+
+                선택자와 일치하지 않는 문서 객체를 선택 
+
+                요소:nth-child(3n+1) 
+
+                3n+1번째에 위치하는 문서 객체를 선택 
+            */
+
+        }
+    </script>
+
+    <!-- childCheck()는 각 소 재목의 테이블 마다 동일한 ID를 입력해야 한다 -->
+
+    <table id="checkTable">
+        <input type="checkbox" onclick="childCheck()">
+
+        <table>
+            <tbody>
+                <tr>
+                    <!-- 테이블의 최상단 column의 check박스는 전체 체크박스에 체크/해제 역할 - 자바 스크립트 -->
+                    <th>
+                        <input type="checkbox" id="checkAll">
+                    </th>
+                    <th>col1</th>
+                    <th>col2</th>
+                    <th>col3</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        <input type="checkbox" name="checkboxName">
+                    </td>
+                    <td>col1 text</td>
+                    <td>col2 text</td>
+                    <td>col3 text</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <section id="section6">
+
+            <style type="text/css">
+                .container {
+                    width: 800px;
+                    height: 400px;
+                    border: 1px solid gray;
+                    position: relative;
+                }
+                
+                .box {
+                    width: 100px;
+                    height: 100px;
+                    background: blue;
+                    position: absolute;
+                    top: 10px;
+                }
+            </style>
+            <div class="container" draggable="true">
+                <!-- <div class="box"> DND dropzone
+            </div>
+            <div class="box"> 
+            </div> -->
+                <div class="box">
+                </div>
+            </div>
+
+            <script>
+                window.addEventListener("load", function() {
+                    var section = document.querySelector("#section6");
+                    var container = document.querySelector(".container");
+                    var box = section.querySelector(".box");
+                    var offset = {
+                        x: 0,
+                        y: 0
+                    };
+                    var left = container.offsetX;
+                    var top = container.offsetY;
+                    container.onclick = function(e) {
+                        //e.x, e.y / e.offsetX, e.offsetY / e.clientX, e.pageX...
+                        console.log("(x, y):" + e.x + ", " + e.y);
+                        console.log("(x, y):" + e.clientX + ", " + e.clientY);
+                        console.log("(x, y):" + e.offsetX + ", " + e.offsetY);
+                        console.log("(x, y):" + e.pageX + ", " + e.pageY);
+                        box.style.position = "absoulte";
+                        box.style.left = e.x - offset.x - left + "px";
+                        box.style.top = e.y - offset.y - top + "px";
+                    }
+
+                    var dragging = false;
+
+                    box.onmousedown = function(e) {
+                        offset.x = e.offsetX;
+                        offset.y = e.offsetY;
+                    }
+
+                    var current = null;
+                    container.onmousedown = function(e) {
+
+                        if (e.target.classList.contains("box") === box) {
+                            dragging = true;
+                            current = e.target;
+                        }
+
+                        if (e.target == box) {
+                            dragging = true;
+                        }
+
+                        //container.setCapture();
+                    }
+
+                    container.onmousemove = function(e) {
+
+                        if (!dragging) return;
+
+                        //e.x, e.y / e.offsetX, e.offsetY / e.clientX, e.pageX...
+                        console.log("(x, y):" + e.x + ", " + e.y);
+                        console.log("(x, y):" + e.clientX + ", " + e.clientY);
+                        console.log("(x, y):" + e.offsetX + ", " + e.offsetY);
+                        console.log("(x, y):" + e.pageX + ", " + e.pageY);
+                        box.style.position = "absoulte";
+                        box.style.left = e.x + "px";
+                        box.style.top = e.y + "px";
+                    }
+
+                    container.onmouseup = function(e) {
+                        dragging = false;
+                    }
+                })
+            </script>
+        </section>
+</body>
+
+</html>

@@ -16,12 +16,18 @@
 <!-- #include Virtual = "/dBHelper.inc.asp" -->
 <!-- #include Virtual = "/jsonObject.inc.asp" -->
 <%
+
+  
  
   Response.CharSet="UTF-8"
   Response.Codepage = 65001
   'Session.codepage="65001"
   'Response.codepage="65001"
   'Response.ContentType="text/html;charset=utf-8"
+
+Dim larr_high
+larr_high = Array(0, 1, 2, 3, 4, 5, 6)
+Response.write "larr_high=>" & larr_high(1) & "<br>"
 
 Dim conn : Set conn = Server.CreateObject("ADODB.Connection")
 
@@ -134,22 +140,48 @@ Response.Write objCrt_Dic.Item("1") & "<br>"
 Response.Write "varType : " & varType(arrKey2(0)) & "<br>"
 
 Response.Write Right("00" & hour(time()), 2) & "<br>"
-Response.Write Year(date()) & Right("00" & month(date()), 2) & Right("00" & day(date()), 2)
+Response.Write Year(date()) & Right("00" & month(date()), 2) & Right("00" & day(date()), 2) & "<br><br>"
 
-Dim patternText : patternText = "[+-/*//]"
-Dim content : content = "L1+L2-L3*L4/L5"
-Dim regex, ResultReg
+Dim patternText : patternText = "[*/+-]"
+Dim str_cal : str_cal = "L1+L2-L3*L4/L5"
+Dim regex, ResultReg, tmp_arr
+
 Set regex = New RegExp
 
 regex.Pattern = patternText
-regex.IgnoreCase = False
+regex.IgnoreCase = True
 regex.Global = True
 
-Set ResultReg = regex.Execute(content)
+Set Matches = regex.Execute(str_cal)
+tmp_arr = Split(regEx.Replace(str_cal, ","), ",")
+Dim right_side, left_side, pre_operand
+
+Response.Write "Matches.Count=>" & Matches.Count & "<br>"
+
+IF Matches.Count <> 0 THEN
+   For i = 0 To  Matches.Count - 1   
+       left_side = tmp_arr(i)
+       right_side = tmp_arr(i+1)   
+       IF pre_operand = "" THEN
+          pre_operand = "+"
+       ELSE
+          Response.Write "Matches(i-1).Value=>" & i & ", " & Matches(i-1).Value & "<br>"
+          pre_operand = Matches(i-1).Value
+       End IF
+   Next
+End IF
+
+'For i = 0 To UBound(tmp_arr)
+'    Response.Write "tmp_arr=>" & tmp_arr & "<br>"
+'Next
+'tmp_arr = Split(regEx.Replace(str_cal, ","), ",")
+Response.Write "str_cal=>" & str_cal & "<br>"
+Response.Write "Matches.Count=>" & Matches.Count & "<br>"
+
 'Response.Write "<br><br>"
 'Response.Write ResultReg.Count & "<br>"
-if ResultReg.Count <> 0 then
-    For Each Match In ResultReg
+if Matches.Count <> 0 then
+    For Each Match In Matches
         resultString = Match.Value
         'Response.Write resultString & "<br>"
     Next
@@ -160,6 +192,7 @@ if ResultReg.Count <> 0 then
     '    resultString = Match(i)
     'Next
 end if
+
 Response.Write "<br><br>"
 Dim aTest : aTest = Array("L01+L03+L04+L05+0.297*L78+0.242*L79", 0, 0, 2.3, 5.6, 1.2, 2.3)
 Dim aVal : aVal = Array("L23+L24+L25+L26+L27+0.188*L79", 0, 0, 3.3, 6.6, 2.7, 3.8)
@@ -200,7 +233,6 @@ IF ls_el <> "" Then
    ls_el = Left(ls_el, len(ls_el) - 1)
    Response.Write ls_el & "<br>"
 End If
-
 
 ReDim paramInfo(2)
 

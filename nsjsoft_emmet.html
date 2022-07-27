@@ -16,6 +16,7 @@
             $('<li><b>리스트 항목 append</b></li>').appendTo('ul');
             $('ul').prepend('<li><b>리스트 항목 append</b></li>');
             $('<li><b>리스트 항목 append</b></li>').prependTo('ul');
+            console.log("test=>" + $("#list").data("exam-no"));
         });
 
         var a = 1;
@@ -28,7 +29,7 @@
 </head>
 
 <body>
-    <ul>
+    <ul id="list" data-exam-no="nsjsoft">
         <li>리스트 항목1</li>
         <li>리스트 항목2</li>
         <li>리스트 항목3</li>
@@ -62,7 +63,6 @@
     <div></div>
     <p></p>
     <blockquote></blockquote>
-
     <!-- div+div>p>span+em^bq -->
     <div></div>
     <div>
@@ -110,7 +110,7 @@
     <!-- td[title="Hello world!" colspan=3] -->
     <td title="hello world!" colspan="3"></td>
 
-    <!-- #page>#nav>ul>li[class="item-$$@5"]{목록아이팀}*5 -->
+    <!-- #page>#nav>ul>li[class="item-$$@5"]{목록아이템}*5 -->
     <div id="page">
         <div id="nav">
             <ul>
@@ -160,7 +160,6 @@
         <li class="item4"></li>
         <li class="item5"></li>
     </ul>
-
 
     <!-- .fruit{banana} -->
     <div class="fruit">banana</div>
